@@ -50,6 +50,9 @@ class CommonTester:
 		self.compile_flags = []
 		self.exercise_files = []
 		self.test_files = []
+		self.is_program = False;
+		self.custom_program_name = "a.out"
+		self.program_args = [""]
 		self.compile = []
 		self.norm_ignore = []
 		self.temp_dir = info.base_dir / "temp" / self.name
@@ -122,31 +125,52 @@ class CommonTester:
 		return result.returncode == 0
 
 	def compile_files(self):
-		files = self.test_files + self.exercise_files
-		flags = self.compile_flags if self.compile_flags else DEFAULT_COMPILE_FLAGS
+		if self.is_program == False:
+			files = self.test_files + self.exercise_files
+			flags = self.compile_flags if self.compile_flags else DEFAULT_COMPILE_FLAGS
 
-		logger.info(f"compiling files: {files} with flags: {flags}")
-		# result = os.system(f"gcc { " ".join(flags) } { " ".join(files) }")
-		gcc_exec = ["gcc"] + flags + files
+			logger.info(f"compiling files: {files} with flags: {flags}")
+			# result = os.system(f"gcc { " ".join(flags) } { " ".join(files) }")
+			gcc_exec = ["gcc"] + flags + files
 
-		print(f"{TC.CYAN}Executing: {TC.B_WHITE}{' '.join(gcc_exec)}{TC.NC}:")
-		p = subprocess.Popen(gcc_exec)
-		p.wait()
+			print(f"{TC.CYAN}Executing: {TC.B_WHITE}{' '.join(gcc_exec)}{TC.NC}:")
+			p = subprocess.Popen(gcc_exec)
+			p.wait()
 
-		if p.returncode == 0:
-			print(f"{TC.GREEN}gcc: OK!{TC.NC}")
+			if p.returncode == 0:
+				print(f"{TC.GREEN}gcc: OK!{TC.NC}")
+			else:
+				print(f"{TC.B_RED}Problem compiling files{TC.NC}")
+
+			return p.returncode
 		else:
-			print(f"{TC.B_RED}Problem compiling files{TC.NC}")
+			files_user = self.exercise_files
+			flags = self.compile_flags if self.compile_flags else DEFAULT_COMPILE_FLAGS
 
-		return p.returncode
+			logger.info(f"compiling files: {files_user} with flags: {flags}")
+			# result = os.system(f"gcc { " ".join(flags) } { " ".join(files) }")
+			gcc_exec_user = ["gcc"] + flags + files_user 
+
+			print(f"{TC.CYAN}Executing: {TC.B_WHITE}{' '.join(gcc_exec_user)}{TC.NC}:")
+			p_user = subprocess.Popen(gcc_exec_user)
+			p_user.wait()
+
+			if p_user.returncode == 0:
+				print(f"{TC.GREEN}gcc: OK!{TC.NC}")
+			else:
+				print(f"{TC.B_RED}Problem compiling files{TC.NC}")
+
+			return p_user.returncode
 
 	def execute_program(self, test):
 		logger.info(f"Running the output of the compilation: ")
 		logger.info(f"On directory {os.getcwd()}")
 
-		print(f"\n{TC.CYAN}Executing: {TC.B_WHITE}./a.out | cat -e{TC.NC}:")
+		for i in range(len(self.program_args)):
+			self.program_args[i] = f'"{self.program_args[i]}"'
+		print(f"\n{TC.CYAN}Executing: {TC.B_WHITE}./{self.custom_program_name} {TC.B_PURPLE}{' '.join(self.program_args)} {TC.B_WHITE}| cat -e{TC.NC}:")
 
-		ps = subprocess.Popen('./a.out', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		ps = subprocess.Popen(f"./{self.custom_program_name} {' '.join(self.program_args)}", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
 		output = subprocess.check_output(('cat', '-e'), stdin=ps.stdout)
 		ps.wait()
 		output = output.decode('ascii', errors="backslashreplace")
@@ -278,3 +302,6 @@ class CommonTester:
 		self.compile_flags = []
 		self.compile = []
 		self.norm_ignore = []
+		self.is_program = False
+		self.custom_program_name = "a.out"
+		self.program_args = []
