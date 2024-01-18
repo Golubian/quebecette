@@ -8,6 +8,7 @@ from testers.cpiscine.C02Tester import C02Tester
 from testers.cpiscine.C03Tester import C03Tester
 from testers.cpiscine.C04Tester import C04Tester
 from testers.cpiscine.C05Tester import C05Tester
+from testers.cpiscine.C06Tester import C06Tester
 from utils.ExecutionContext import TestRunInfo
 
 logger = logging.getLogger('c selector')
@@ -41,4 +42,6 @@ class CPiscine(BaseTester):
 				return C04Tester
 			if has_file(ex_path, "ft_iterative_factorial.c"):
 				return C05Tester
+			if has_file(ex_path, "ft_print_program_name.c"):
+				return C06Tester
 		return False
