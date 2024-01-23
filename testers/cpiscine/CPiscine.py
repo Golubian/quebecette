@@ -9,6 +9,7 @@ from testers.cpiscine.C03Tester import C03Tester
 from testers.cpiscine.C04Tester import C04Tester
 from testers.cpiscine.C05Tester import C05Tester
 from testers.cpiscine.C06Tester import C06Tester
+from testers.cpiscine.C07Tester import C07Tester
 from utils.ExecutionContext import TestRunInfo
 
 logger = logging.getLogger('c selector')
@@ -44,4 +45,6 @@ class CPiscine(BaseTester):
 				return C05Tester
 			if has_file(ex_path, "ft_print_program_name.c"):
 				return C06Tester
+			if has_file(ex_path, "ft_strdup.c"):
+				return C07Tester
 		return False
